@@ -78,101 +78,30 @@
             font-size: 12px;
         }
     </style>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
 
 <body>
     <div id="chat-container">
-        <h1 style="color: #4CAF50;">Gamingowy Komunikator 2 (Online: <span id="online-count">0</span>)</h1>
-        <label for="nickname-input">Twój nick (max 10 znaków): </label>
-        <input type="text" id="nickname-input" placeholder="Twój nick" maxlength="10">
-        <br>
-        <label for="category-select">Wybierz kategorię gry: </label>
-        <select id="category-select" onchange="updateOnlineCount()">
-            <option value="csgo">CS:GO</option>
-            <option value="lol">League of Legends</option>
-        </select>
-        <br>
+        <h1 style="color: #4CAF50;">Gamingowy Komunikator (Online: <span id="online-count">0</span>)</h1>
         <div id="chat-box"></div>
-        <input type="text" id="message-input" placeholder="Wpisz wiadomość" onkeydown="handleKeyPress()">
-        <button id="send-button" onclick="sendMessage()">Wyślij</button>
         <footer>&copy; 2023 !bpiont Wszystkie prawa zastrzeżone.</footer>
-        <button id="emoji-button" onclick="addEmoji()">😊</button>
     </div>
 
     <script>
-        var onlineCounts = { csgo: 0, lol: 0 };
+        // Obsługa serwera-sent events (SSE)
+        var eventSource = new EventSource('sse-server.php');
+        eventSource.onmessage = function (event) {
+            var data = JSON.parse(event.data);
+            
+            // Aktualizuj licznik online
+            document.getElementById('online-count').textContent = data.onlineCount;
 
-        function sendMessage() {
-            var nicknameInput = $('#nickname-input');
-            var messageInput = $('#message-input');
-            var categorySelect = $('#category-select');
-            var chatBox = $('#chat-box');
-
-            var nickname = nicknameInput.val();
-            var message = messageInput.val();
-            var category = categorySelect.val();
-
-            if (nickname.trim() !== '' && message.trim() !== '') {
-                if (nickname.length <= 10) {
-                    var formattedMessage = '<p><strong>' + category + ' - ' + nickname + ':</strong> ' + message + '</p>';
-                    chatBox.append(formattedMessage);
-                    messageInput.val('');
-
-                    // Pobierz i wyślij wiadomość na serwer za pomocą AJAX
-                    $.ajax({
-                        type: 'POST',
-                        url: '/send-message',
-                        data: { category: category, nickname: nickname, message: message },
-                        success: function () {
-                            // Aktualizuj licznik online
-                            updateOnlineCount();
-                        },
-                        error: function () {
-                            console.error('Wystąpił błąd podczas wysyłania wiadomości.');
-                        }
-                    });
-                } else {
-                    alert('Nick musi mieć maksymalnie 10 znaków.');
-                }
-            }
-        }
-
-        function handleKeyPress() {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        }
-
-        function addEmoji() {
-            var messageInput = $('#message-input');
-            messageInput.val(messageInput.val() + ' 😊 ');
-        }
-
-        function updateOnlineCount() {
-            var categorySelect = $('#category-select');
-            var onlineCountElement = $('#online-count');
-
-            var category = categorySelect.val();
-            onlineCountElement.text(onlineCounts[category] ? onlineCounts[category] : 0);
-        }
-
-        // Pobieraj nowe wiadomości z serwera co 3 sekundy
-        setInterval(fetchMessages, 3000);
-
-        function fetchMessages() {
-            $.ajax({
-                type: 'GET',
-                url: '/get-messages',
-                success: function (data) {
-                    // Uaktualnij chat box na podstawie danych z serwera
-                    $('#chat-box').html(data);
-                },
-                error: function () {
-                    console.error('Wystąpił błąd podczas pobierania wiadomości.');
-                }
+            // Wyświetl nowe wiadomości
+            var chatBox = document.getElementById('chat-box');
+            data.newMessages.forEach(function (message) {
+                chatBox.innerHTML += '<p>' + message + '</p>';
             });
-        }
+        };
     </script>
 </body>
 
