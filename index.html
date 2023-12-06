@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gamingowy Komunikator +</title>
+    <title>Gamingowy Komunikator</title>
     <style>
         /* Styl CSS (bez zmian) */
         body {
@@ -82,7 +82,7 @@
 
 <body>
     <div id="chat-container">
-        <h1 style="color: #4CAF50;">Gamingowy Komunikator (Online: <span id="online-count">0</span>)</h1>
+        <h1 style="color: #4CAF50;">Szukam Graczy (Online: <span id="online-count">0</span>)</h1>
         <label for="nickname-input">Twój nick (max 10 znaków): </label>
         <input type="text" id="nickname-input" placeholder="Twój nick" maxlength="10">
         <br>
@@ -173,6 +173,9 @@
                 chatBox.innerHTML = messages.join('');
             }
         }
+
+        // Fetch and display new messages every 5 seconds
+        setInterval(fetchMessages, 5000);
 
         checkSavedNickname();
         updateOnlineCount();
