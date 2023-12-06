@@ -82,7 +82,7 @@
 
 <body>
     <div id="chat-container">
-        <h1 style="color: #4CAF50;">Gamingowy Komunikator (Online: <span id="online-count">0</span>)</h1>
+        <h1 style="color: #4CAF50;">Gamingowy Komunikator 2 (Online: <span id="online-count">0</span>)</h1>
         <label for="nickname-input">Twój nick (max 10 znaków): </label>
         <input type="text" id="nickname-input" placeholder="Twój nick" maxlength="10">
         <br>
@@ -126,6 +126,9 @@
                 }).then(function () {
                     // Czyścimy pole input po wysłaniu wiadomości
                     messageInput.value = '';
+
+                    // Wstaw wysłaną wiadomość od razu do widoku
+                    chatBox.innerHTML += '<p><strong>' + nickname + ':</strong> ' + message + '</p>';
                 }).catch(function (error) {
                     console.error('Wystąpił błąd podczas wysyłania wiadomości:', error);
                 });
