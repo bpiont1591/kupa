@@ -1,2 +1,1 @@
  kupa.github.com
-xd
