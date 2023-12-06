@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
     <title>Gamingowy Komunikator</title>
     <style>
         /* Styl CSS (bez zmian) */
@@ -83,7 +82,7 @@
 
 <body>
     <div id="chat-container">
-        <h1 style="color: #4CAF50;">Szukam Graczy (Online: <span id="online-count">0</span>)</h1>
+        <h1 style="color: #4CAF50;">Gamingowy Komunikator (Online: <span id="online-count">0</span>)</h1>
         <label for="nickname-input">Twój nick (max 10 znaków): </label>
         <input type="text" id="nickname-input" placeholder="Twój nick" maxlength="10">
         <br>
@@ -101,43 +100,15 @@
     </div>
 
     <script>
-        var usedNicknames = {};
         var onlineCounts = { csgo: 0, lol: 0 };
         var messages = [];
 
         function sendMessage() {
-            var nicknameInput = document.getElementById('nickname-input');
-            var messageInput = document.getElementById('message-input');
-            var categorySelect = document.getElementById('category-select');
-            var chatBox = document.getElementById('chat-box');
+            // Implementacja wysyłania wiadomości na serwer (AJAX lub Fetch)
+            // ...
 
-            var nickname = nicknameInput.value;
-            var message = messageInput.value;
-            var category = categorySelect.value;
-
-            if (nickname.trim() !== '' && message.trim() !== '') {
-                if (nickname.length <= 10) {
-                    if (!usedNicknames[category]) {
-                        usedNicknames[category] = [];
-                    }
-
-                    usedNicknames[category].push(nickname);
-                    localStorage.setItem('savedNickname', nickname);
-
-                    var formattedMessage = '<p><strong>' + category + ' - ' + nickname + ':</strong> ' + message + '</p>';
-
-                    chatBox.innerHTML += formattedMessage;
-                    messageInput.value = '';
-
-                    messages.push(formattedMessage);
-                    localStorage.setItem('savedMessages', JSON.stringify(messages));
-
-                    // Aktualizacja licznika osób online po wysłaniu wiadomości
-                    updateOnlineCount();
-                } else {
-                    alert('Nick musi mieć maksymalnie 10 znaków.');
-                }
-            }
+            // Po wysłaniu, odświeżanie wiadomości
+            fetchMessages();
         }
 
         function handleKeyPress() {
@@ -156,31 +127,20 @@
             var onlineCountElement = document.getElementById('online-count');
 
             var category = categorySelect.value;
-            onlineCountElement.textContent = usedNicknames[category] ? usedNicknames[category].length : 0;
+            onlineCountElement.textContent = onlineCounts[category] ? onlineCounts[category] : 0;
         }
 
-        function checkSavedNickname() {
-            var savedNickname = localStorage.getItem('savedNickname');
-            if (savedNickname) {
-                document.getElementById('nickname-input').value = savedNickname;
-            }
+        function fetchMessages() {
+            // Implementacja pobierania nowych wiadomości z serwera (AJAX lub Fetch)
+            // Po pobraniu, zaktualizuj chat box
+            // ...
+
+            // Poniżej przykładowy kod symulujący pobieranie wiadomości co 5 sekund
+            setTimeout(fetchMessages, 5000);
         }
 
-        function loadSavedMessages() {
-            var savedMessages = localStorage.getItem('savedMessages');
-            if (savedMessages) {
-                messages = JSON.parse(savedMessages);
-                var chatBox = document.getElementById('chat-box');
-                chatBox.innerHTML = messages.join('');
-            }
-        }
-
-        // Fetch and display new messages every 5 seconds
-        setInterval(fetchMessages, 5000);
-
-        checkSavedNickname();
-        updateOnlineCount();
-        loadSavedMessages();
+        // Rozpocznij pobieranie wiadomości przy załadowaniu strony
+        fetchMessages();
     </script>
 </body>
 
