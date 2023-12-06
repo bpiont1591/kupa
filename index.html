@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gamingowy Komunikator</title>
+    <style>
+        /* Styl CSS (bez zmian) */
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #1a1a1a;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+        }
+
+        #chat-container {
+            text-align: center;
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        #chat-box {
+            width: 300px;
+            height: 400px;
+            border: 1px solid #555;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+            background-color: #222;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        #message-input,
+        #nickname-input {
+            width: 200px;
+            margin-bottom: 10px;
+            padding: 8px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            background-color: #333;
+            color: #fff;
+        }
+
+        #category-select,
+        #private-message-select { /* Dodane */
+            width: 200px;
+            margin-bottom: 10px;
+            padding: 8px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            background-color: #333;
+            color: #fff;
+        }
+
+        #send-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #send-button:hover {
+            background-color: #45a049;
+        }
+
+        #emoji-button {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        #emoji-button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="chat-container">
+        <h1 style="color: #4CAF50;">Gamingowy Komunikator</h1>
+        <label for="nickname-input">Twój nick: </label>
+        <input type="text" id="nickname-input" placeholder="Twój nick">
+        <br>
+        <label for="category-select">Wybierz kategorię gry: </label>
+        <select id="category-select" onchange="updatePrivateMessageList()"> <!-- Dodane onchange -->
+            <option value="csgo">CS:GO</option>
+            <option value="lol">League of Legends</option>
+        </select>
+        <br>
+        <!-- Dodany nowy element -->
+        <label for="private-message-select">Wybierz odbiorcę wiadomości prywatnej: </label>
+        <select id="private-message-select">
+            <!-- Dynamicznie dodawane opcje z dostępnymi użytkownikami -->
+        </select>
+        <br>
+        <div id="chat-box"></div>
+        <input type="text" id="message-input" placeholder="Wpisz wiadomość" onkeydown="handleKeyPress(event)">
+        <button id="send-button" onclick="sendMessage()">Wyślij</button>
+        <button id="emoji-button" onclick="addEmoji()">😊</button>
+    </div>
+
+    <script>
+        var usedNicknames = {};
+
+        function sendMessage() {
+            var nicknameInput = document.getElementById('nickname-input');
+            var messageInput = document.getElementById('message-input');
+            var categorySelect = document.getElementById('category-select');
+            var privateMessageSelect = document.getElementById('private-message-select');
+
+            var nickname = nicknameInput.value;
+            var message = messageInput.value;
+            var category = categorySelect.value;
+            var privateRecipient = privateMessageSelect.value;
+
+            if (nickname.trim() !== '' && message.trim() !== '') {
+                if (!usedNicknames[category]) {
+                    usedNicknames[category] = [];
+                }
+
+                if (!privateRecipient || usedNicknames[category].includes(privateRecipient)) {
+                    if (!usedNicknames[category].includes(nickname) && usedNicknames[category].indexOf(nickname) === -1) {
+                        usedNicknames[category].push(nickname);
+                        localStorage.setItem('savedNickname', nickname);
+
+                        var chatBox = document.getElementById('chat-box');
+                        var formattedMessage = privateRecipient
+                            ? '<p><strong>Priv [' + nickname + ' to ' + privateRecipient + ']:</strong> ' + message + '</p>'
+                            : '<p><strong>' + category + ' - ' + nickname + ':</strong> ' + message + '</p>';
+
+                        chatBox.innerHTML += formattedMessage;
+                        messageInput.value = '';
+                    } else {
+                        alert('Ten nick jest już używany w wybranej kategorii lub jest obecnie używany w tej sesji. Wybierz inny.');
+                    }
+                } else {
+                    alert('Wybrany odbiorca prywatnej wiadomości nie istnieje w wybranej kategorii.');
+                }
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function addEmoji() {
+            var messageInput = document.getElementById('message-input');
+            messageInput.value += ' 😊 ';
+        }
+
+        // Dodana funkcja do aktualizacji listy dostępnych odbiorców prywatnych wiadomości
+        function updatePrivateMessageList() {
+            var categorySelect = document.getElementById('category-select');
+            var privateMessageSelect = document.getElementById('private-message-select');
+
+            // Tutaj możesz dynamicznie zaktualizować opcje na liście dostępnych odbiorców
+            // W przykładzie zakładamy, że odbiorcami mogą być wszyscy użytkownicy w wybranej kategorii
+            var category = categorySelect.value;
+            var usersInCategory = usedNicknames[category] || [];
+            privateMessageSelect.innerHTML = ''; // Wyczyść istniejące opcje
+
+            // Dodaj opcje do listy
+            for (var i = 0; i < usersInCategory.length; i++) {
+                var option = document.createElement('option');
+                option.value = usersInCategory[i];
+                option.text = usersInCategory[i];
+                privateMessageSelect.add(option);
+            }
+        }
+
+        function checkSavedNickname() {
+            var savedNickname = localStorage.getItem('savedNickname');
+            if (savedNickname) {
+                document.getElementById('nickname-input').value = savedNickname;
+            }
+        }
+
+        checkSavedNickname();
+        updatePrivateMessageList(); // Dodane - aktualizuj listę dostępnych odbiorców przy ładowaniu strony
+    </script>
+</body>
+
+</html>
