@@ -82,7 +82,7 @@
 
 <body>
     <div id="chat-container">
-        <h1 style="color: #4CAF50;">Gamingowy Komunikator 2 (Online: <span id="online-count">0</span>)</h1>
+        <h1 style="color: #4CAF50;">Gamingowy Komunikator (Online: <span id="online-count">0</span>)</h1>
         <label for="nickname-input">Twój nick (max 10 znaków): </label>
         <input type="text" id="nickname-input" placeholder="Twój nick" maxlength="10">
         <br>
@@ -103,7 +103,7 @@
             var data = JSON.parse(event.data);
 
             // Aktualizuj licznik online
-            onlineCountElement.textContent = data.onlineCount;
+            onlineCountElement.textContent = data.onlineUsers.length;
 
             // Wyświetl nowe wiadomości
             data.newMessages.forEach(function (message) {
