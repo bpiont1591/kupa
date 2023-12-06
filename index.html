@@ -16,6 +16,7 @@
             background-color: #1a1a1a;
             color: #fff;
             font-family: 'Arial', sans-serif;
+            overflow: hidden; /* Dodano */
         }
 
         #chat-container {
@@ -24,10 +25,13 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            width: 100%; /* Dodano */
+            height: 100%; /* Dodano */
+            box-sizing: border-box; /* Dodano */
         }
 
         #chat-box {
-            width: 300px;
+            width: 100%; /* Zmieniono szerokość na 100% */
             height: 400px;
             border: 1px solid #555;
             overflow-y: scroll;
@@ -49,7 +53,7 @@
         }
 
         #category-select,
-        #private-message-select { /* Dodane */
+        #private-message-select {
             width: 200px;
             margin-bottom: 10px;
             padding: 8px;
@@ -91,27 +95,29 @@
 
 <body>
     <div id="chat-container">
-        <h1 style="color: #4CAF50;">Gamingowy Komunikator</h1>
-        <label for="nickname-input">Twój nick: </label>
-        <input type="text" id="nickname-input" placeholder="Twój nick">
+        <h1 style="color: #4CAF50;">Gamingowy Komunikator (Online: <span id="online-count">0</span>)</h1>
+        <label for="nickname-input">Twój nick (max 10 znaków): </label>
+        <input type="text" id="nickname-input" placeholder="Twój nick" maxlength="10">
         <br>
         <label for="category-select">Wybierz kategorię gry: </label>
-        <select id="category-select" onchange="updatePrivateMessageList()"> <!-- Dodane onchange -->
+        <select id="category-select" onchange="updatePrivateMessageList()">
             <option value="csgo">CS:GO</option>
             <option value="lol">League of Legends</option>
         </select>
         <br>
-        <!-- Dodany nowy element -->
         <label for="private-message-select">Wybierz odbiorcę wiadomości prywatnej: </label>
         <select id="private-message-select">
-            <!-- Dynamicznie dodawane opcje z dostępnymi użytkownikami -->
         </select>
         <br>
         <div id="chat-box"></div>
-        <input type="text" id="message-input" placeholder="Wpisz wiadomość" onkeydown="handleKeyPress(event)">
+        <input type="text" id="message-input" placeholder="Wpisz wiadomość" onkeydown="handleKeyPress()">
         <button id="send-button" onclick="sendMessage()">Wyślij</button>
+        <footer style="text-align: center; margin-top: 20px; color: #888; font-size: 12px;">
+            &copy; 2023 !bpiont Wszystkie prawa zastrzeżone.
+        </footer>
         <button id="emoji-button" onclick="addEmoji()">😊</button>
     </div>
+
 
     <script>
         var usedNicknames = {};
@@ -121,6 +127,7 @@
             var messageInput = document.getElementById('message-input');
             var categorySelect = document.getElementById('category-select');
             var privateMessageSelect = document.getElementById('private-message-select');
+            var onlineCountElement = document.getElementById('online-count');
 
             var nickname = nicknameInput.value;
             var message = messageInput.value;
@@ -128,12 +135,12 @@
             var privateRecipient = privateMessageSelect.value;
 
             if (nickname.trim() !== '' && message.trim() !== '') {
-                if (!usedNicknames[category]) {
-                    usedNicknames[category] = [];
-                }
+                if (nickname.length <= 10) {
+                    if (!usedNicknames[category]) {
+                        usedNicknames[category] = [];
+                    }
 
-                if (!privateRecipient || usedNicknames[category].includes(privateRecipient)) {
-                    if (!usedNicknames[category].includes(nickname) && usedNicknames[category].indexOf(nickname) === -1) {
+                    if (!privateRecipient || usedNicknames[category].includes(privateRecipient)) {
                         usedNicknames[category].push(nickname);
                         localStorage.setItem('savedNickname', nickname);
 
@@ -144,16 +151,19 @@
 
                         chatBox.innerHTML += formattedMessage;
                         messageInput.value = '';
+
+                        // Aktualizacja licznika osób online po wysłaniu wiadomości
+                        updatePrivateMessageList();
                     } else {
-                        alert('Ten nick jest już używany w wybranej kategorii lub jest obecnie używany w tej sesji. Wybierz inny.');
+                        alert('Wybrany odbiorca prywatnej wiadomości nie istnieje w wybranej kategorii.');
                     }
                 } else {
-                    alert('Wybrany odbiorca prywatnej wiadomości nie istnieje w wybranej kategorii.');
+                    alert('Nick musi mieć maksymalnie 10 znaków.');
                 }
             }
         }
 
-        function handleKeyPress(event) {
+        function handleKeyPress() {
             if (event.key === 'Enter') {
                 sendMessage();
             }
@@ -164,24 +174,24 @@
             messageInput.value += ' 😊 ';
         }
 
-        // Dodana funkcja do aktualizacji listy dostępnych odbiorców prywatnych wiadomości
         function updatePrivateMessageList() {
             var categorySelect = document.getElementById('category-select');
             var privateMessageSelect = document.getElementById('private-message-select');
+            var onlineCountElement = document.getElementById('online-count');
 
-            // Tutaj możesz dynamicznie zaktualizować opcje na liście dostępnych odbiorców
-            // W przykładzie zakładamy, że odbiorcami mogą być wszyscy użytkownicy w wybranej kategorii
             var category = categorySelect.value;
             var usersInCategory = usedNicknames[category] || [];
-            privateMessageSelect.innerHTML = ''; // Wyczyść istniejące opcje
+            privateMessageSelect.innerHTML = '';
 
-            // Dodaj opcje do listy
             for (var i = 0; i < usersInCategory.length; i++) {
                 var option = document.createElement('option');
                 option.value = usersInCategory[i];
                 option.text = usersInCategory[i];
                 privateMessageSelect.add(option);
             }
+
+            // Aktualizacja licznika osób online
+            onlineCountElement.textContent = usersInCategory.length;
         }
 
         function checkSavedNickname() {
@@ -192,8 +202,9 @@
         }
 
         checkSavedNickname();
-        updatePrivateMessageList(); // Dodane - aktualizuj listę dostępnych odbiorców przy ładowaniu strony
+        updatePrivateMessageList();
     </script>
 </body>
+
 
 </html>
