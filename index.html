@@ -83,25 +83,60 @@
 <body>
     <div id="chat-container">
         <h1 style="color: #4CAF50;">Gamingowy Komunikator (Online: <span id="online-count">0</span>)</h1>
+        <label for="nickname-input">Twój nick (max 10 znaków): </label>
+        <input type="text" id="nickname-input" placeholder="Twój nick" maxlength="10">
+        <br>
         <div id="chat-box"></div>
+        <input type="text" id="message-input" placeholder="Wpisz wiadomość" onkeydown="handleKeyPress()">
+        <button id="send-button" onclick="sendMessage()">Wyślij</button>
         <footer>&copy; 2023 !bpiont Wszystkie prawa zastrzeżone.</footer>
     </div>
 
     <script>
-        // Obsługa serwera-sent events (SSE)
+        var onlineCountElement = document.getElementById('online-count');
+        var chatBox = document.getElementById('chat-box');
+        var messageInput = document.getElementById('message-input');
+        var nicknameInput = document.getElementById('nickname-input');
         var eventSource = new EventSource('sse-server.php');
+
         eventSource.onmessage = function (event) {
             var data = JSON.parse(event.data);
-            
+
             // Aktualizuj licznik online
-            document.getElementById('online-count').textContent = data.onlineCount;
+            onlineCountElement.textContent = data.onlineCount;
 
             // Wyświetl nowe wiadomości
-            var chatBox = document.getElementById('chat-box');
             data.newMessages.forEach(function (message) {
                 chatBox.innerHTML += '<p>' + message + '</p>';
             });
         };
+
+        function sendMessage() {
+            var message = messageInput.value.trim();
+            var nickname = nicknameInput.value.trim();
+
+            if (message !== '' && nickname !== '') {
+                // Wysyłaj nową wiadomość do serwera
+                fetch('send-message.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'nickname=' + encodeURIComponent(nickname) + '&message=' + encodeURIComponent(message),
+                }).then(function () {
+                    // Czyścimy pole input po wysłaniu wiadomości
+                    messageInput.value = '';
+                }).catch(function (error) {
+                    console.error('Wystąpił błąd podczas wysyłania wiadomości:', error);
+                });
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
     </script>
 </body>
 
