@@ -1,2 +1,2 @@
-# kupa
+ kupa.github.com
 xd
