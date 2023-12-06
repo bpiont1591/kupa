@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gamingowy Komunikator</title>
+    <title>Gamingowy Komunikator +</title>
     <style>
         /* Styl CSS (bez zmian) */
         body {
@@ -16,7 +16,7 @@
             background-color: #1a1a1a;
             color: #fff;
             font-family: 'Arial', sans-serif;
-            overflow: hidden; /* Dodano */
+            overflow: hidden;
         }
 
         #chat-container {
@@ -25,14 +25,14 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-            width: 100%; /* Dodano */
-            height: 100%; /* Dodano */
-            box-sizing: border-box; /* Dodano */
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
         }
 
         #chat-box {
-            width: 100%; /* Zmieniono szerokość na 100% */
-            height: 400px;
+            width: 100%;
+            height: 300px;
             border: 1px solid #555;
             overflow-y: scroll;
             margin-bottom: 10px;
@@ -42,8 +42,9 @@
         }
 
         #message-input,
-        #nickname-input {
-            width: 200px;
+        #nickname-input,
+        #category-select {
+            width: 100%;
             margin-bottom: 10px;
             padding: 8px;
             border: 1px solid #555;
@@ -52,43 +53,29 @@
             color: #fff;
         }
 
-        #category-select,
-        #private-message-select {
-            width: 200px;
-            margin-bottom: 10px;
-            padding: 8px;
-            border: 1px solid #555;
-            border-radius: 5px;
-            background-color: #333;
-            color: #fff;
-        }
-
-        #send-button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        #send-button:hover {
-            background-color: #45a049;
-        }
-
+        #send-button,
         #emoji-button {
-            background-color: #333;
+            width: 100%;
+            background-color: #4CAF50;
             color: white;
             padding: 10px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
+            margin-top: 10px;
         }
 
+        #send-button:hover,
         #emoji-button:hover {
-            background-color: #555;
+            background-color: #45a049;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #888;
+            font-size: 12px;
         }
     </style>
 </head>
@@ -100,39 +87,32 @@
         <input type="text" id="nickname-input" placeholder="Twój nick" maxlength="10">
         <br>
         <label for="category-select">Wybierz kategorię gry: </label>
-        <select id="category-select" onchange="updatePrivateMessageList()">
+        <select id="category-select" onchange="updateOnlineCount()">
             <option value="csgo">CS:GO</option>
             <option value="lol">League of Legends</option>
-        </select>
-        <br>
-        <label for="private-message-select">Wybierz odbiorcę wiadomości prywatnej: </label>
-        <select id="private-message-select">
         </select>
         <br>
         <div id="chat-box"></div>
         <input type="text" id="message-input" placeholder="Wpisz wiadomość" onkeydown="handleKeyPress()">
         <button id="send-button" onclick="sendMessage()">Wyślij</button>
-        <footer style="text-align: center; margin-top: 20px; color: #888; font-size: 12px;">
-            &copy; 2023 !bpiont Wszystkie prawa zastrzeżone.
-        </footer>
+        <footer>&copy; 2023 !bpiont Wszystkie prawa zastrzeżone.</footer>
         <button id="emoji-button" onclick="addEmoji()">😊</button>
     </div>
 
-
     <script>
         var usedNicknames = {};
+        var onlineCounts = { csgo: 0, lol: 0 };
+        var messages = [];
 
         function sendMessage() {
             var nicknameInput = document.getElementById('nickname-input');
             var messageInput = document.getElementById('message-input');
             var categorySelect = document.getElementById('category-select');
-            var privateMessageSelect = document.getElementById('private-message-select');
-            var onlineCountElement = document.getElementById('online-count');
+            var chatBox = document.getElementById('chat-box');
 
             var nickname = nicknameInput.value;
             var message = messageInput.value;
             var category = categorySelect.value;
-            var privateRecipient = privateMessageSelect.value;
 
             if (nickname.trim() !== '' && message.trim() !== '') {
                 if (nickname.length <= 10) {
@@ -140,23 +120,19 @@
                         usedNicknames[category] = [];
                     }
 
-                    if (!privateRecipient || usedNicknames[category].includes(privateRecipient)) {
-                        usedNicknames[category].push(nickname);
-                        localStorage.setItem('savedNickname', nickname);
+                    usedNicknames[category].push(nickname);
+                    localStorage.setItem('savedNickname', nickname);
 
-                        var chatBox = document.getElementById('chat-box');
-                        var formattedMessage = privateRecipient
-                            ? '<p><strong>Priv [' + nickname + ' to ' + privateRecipient + ']:</strong> ' + message + '</p>'
-                            : '<p><strong>' + category + ' - ' + nickname + ':</strong> ' + message + '</p>';
+                    var formattedMessage = '<p><strong>' + category + ' - ' + nickname + ':</strong> ' + message + '</p>';
 
-                        chatBox.innerHTML += formattedMessage;
-                        messageInput.value = '';
+                    chatBox.innerHTML += formattedMessage;
+                    messageInput.value = '';
 
-                        // Aktualizacja licznika osób online po wysłaniu wiadomości
-                        updatePrivateMessageList();
-                    } else {
-                        alert('Wybrany odbiorca prywatnej wiadomości nie istnieje w wybranej kategorii.');
-                    }
+                    messages.push(formattedMessage);
+                    localStorage.setItem('savedMessages', JSON.stringify(messages));
+
+                    // Aktualizacja licznika osób online po wysłaniu wiadomości
+                    updateOnlineCount();
                 } else {
                     alert('Nick musi mieć maksymalnie 10 znaków.');
                 }
@@ -174,24 +150,12 @@
             messageInput.value += ' 😊 ';
         }
 
-        function updatePrivateMessageList() {
+        function updateOnlineCount() {
             var categorySelect = document.getElementById('category-select');
-            var privateMessageSelect = document.getElementById('private-message-select');
             var onlineCountElement = document.getElementById('online-count');
 
             var category = categorySelect.value;
-            var usersInCategory = usedNicknames[category] || [];
-            privateMessageSelect.innerHTML = '';
-
-            for (var i = 0; i < usersInCategory.length; i++) {
-                var option = document.createElement('option');
-                option.value = usersInCategory[i];
-                option.text = usersInCategory[i];
-                privateMessageSelect.add(option);
-            }
-
-            // Aktualizacja licznika osób online
-            onlineCountElement.textContent = usersInCategory.length;
+            onlineCountElement.textContent = usedNicknames[category] ? usedNicknames[category].length : 0;
         }
 
         function checkSavedNickname() {
@@ -201,10 +165,19 @@
             }
         }
 
+        function loadSavedMessages() {
+            var savedMessages = localStorage.getItem('savedMessages');
+            if (savedMessages) {
+                messages = JSON.parse(savedMessages);
+                var chatBox = document.getElementById('chat-box');
+                chatBox.innerHTML = messages.join('');
+            }
+        }
+
         checkSavedNickname();
-        updatePrivateMessageList();
+        updateOnlineCount();
+        loadSavedMessages();
     </script>
 </body>
-
 
 </html>
