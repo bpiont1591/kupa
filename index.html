@@ -1,146 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gamingowy Komunikator</title>
-    <style>
-        /* Styl CSS (bez zmian) */
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #1a1a1a;
-            color: #fff;
-            font-family: 'Arial', sans-serif;
-            overflow: hidden;
-        }
-
-        #chat-container {
-            text-align: center;
-            background-color: #333;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-            width: 100%;
-            height: 100%;
-            box-sizing: border-box;
-        }
-
-        #chat-box {
-            width: 100%;
-            height: 300px;
-            border: 1px solid #555;
-            overflow-y: scroll;
-            margin-bottom: 10px;
-            background-color: #222;
-            padding: 10px;
-            border-radius: 5px;
-        }
-
-        #message-input,
-        #nickname-input,
-        #category-select {
-            width: 100%;
-            margin-bottom: 10px;
-            padding: 8px;
-            border: 1px solid #555;
-            border-radius: 5px;
-            background-color: #333;
-            color: #fff;
-        }
-
-        #send-button,
-        #emoji-button {
-            width: 100%;
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 10px;
-        }
-
-        #send-button:hover,
-        #emoji-button:hover {
-            background-color: #45a049;
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 20px;
-            color: #888;
-            font-size: 12px;
-        }
-    </style>
+    <title>czatpogaduszki.pl</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
     <div id="chat-container">
-        <h1 style="color: #4CAF50;">Gamingowy Komunikator (Online: <span id="online-count">0</span>)</h1>
-        <label for="nickname-input">Twój nick (max 10 znaków): </label>
-        <input type="text" id="nickname-input" placeholder="Twój nick" maxlength="10">
-        <br>
-        <div id="chat-box"></div>
-        <input type="text" id="message-input" placeholder="Wpisz wiadomość" onkeydown="handleKeyPress()">
-        <button id="send-button" onclick="sendMessage()">Wyślij</button>
-        <footer>&copy; 2023 !bpiont Wszystkie prawa zastrzeżone.</footer>
+        <header>
+            <h1>czatpogaduszki.pl</h1>
+            <div id="online-users" class="online-users"><i class="fas fa-user"></i> <span id="online-count">0</span></div>
+        </header>
+        <main>
+            <select id="region-select">
+                <option value="">Wybierz województwo</option>
+                <option value="dolnośląskie">Dolnośląskie</option>
+                <option value="kujawsko-pomorskie">Kujawsko-Pomorskie</option>
+                <option value="lubelskie">Lubelskie</option>
+                <option value="lubuskie">Lubuskie</option>
+                <option value="łódzkie">Łódzkie</option>
+                <option value="małopolskie">Małopolskie</option>
+                <option value="mazowieckie">Mazowieckie</option>
+                <option value="opolskie">Opolskie</option>
+                <option value="podkarpackie">Podkarpackie</option>
+                <option value="podlaskie">Podlaskie</option>
+                <option value="pomorskie">Pomorskie</option>
+                <option value="śląskie">Śląskie</option>
+                <option value="świętokrzyskie">Świętokrzyskie</option>
+                <option value="warmińsko-mazurskie">Warmińsko-Mazurskie</option>
+                <option value="wielkopolskie">Wielkopolskie</option>
+                <option value="zachodniopomorskie">Zachodniopomorskie</option>
+            </select>
+            <button id="connect-button">Połącz z obcym</button>
+            <div id="messages-container">
+                <div id="messages"></div>
+                <div id="typing" style="display: none;">Obcy pisze...</div>
+            </div>
+            <form id="message-form" style="display: none;">
+                <input id="message-input" type="text" placeholder="Wpisz wiadomość..." autocomplete="off">
+                <button type="submit">Wyślij</button>
+            </form>
+            <button id="discord-button" onclick="window.open('https://discord.com', '_blank')">Dołącz do nas na Discordzie</button>
+        </main>
     </div>
-
+    <script src="/socket.io/socket.io.js"></script>
     <script>
-        var onlineCountElement = document.getElementById('online-count');
-        var chatBox = document.getElementById('chat-box');
-        var messageInput = document.getElementById('message-input');
-        var nicknameInput = document.getElementById('nickname-input');
-        var eventSource = new EventSource('sse-server.php');
+        const socket = io();
 
-        eventSource.onmessage = function (event) {
-            var data = JSON.parse(event.data);
+        const connectButton = document.getElementById('connect-button');
+        const form = document.getElementById('message-form');
+        const input = document.getElementById('message-input');
+        const messages = document.getElementById('messages');
+        const typingIndicator = document.getElementById('typing');
+        const onlineUsers = document.getElementById('online-users');
+        const onlineCount = document.getElementById('online-count');
+        const regionSelect = document.getElementById('region-select');
 
-            // Aktualizuj licznik online
-            onlineCountElement.textContent = data.onlineUsers.length;
-
-            // Wyświetl nowe wiadomości
-            data.newMessages.forEach(function (message) {
-                chatBox.innerHTML += '<p>' + message + '</p>';
-            });
-        };
-
-        function sendMessage() {
-            var message = messageInput.value.trim();
-            var nickname = nicknameInput.value.trim();
-
-            if (message !== '' && nickname !== '') {
-                // Wysyłaj nową wiadomość do serwera
-                fetch('send-message.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: 'nickname=' + encodeURIComponent(nickname) + '&message=' + encodeURIComponent(message),
-                }).then(function () {
-                    // Czyścimy pole input po wysłaniu wiadomości
-                    messageInput.value = '';
-
-                    // Wstaw wysłaną wiadomość od razu do widoku
-                    chatBox.innerHTML += '<p><strong>' + nickname + ':</strong> ' + message + '</p>';
-                }).catch(function (error) {
-                    console.error('Wystąpił błąd podczas wysyłania wiadomości:', error);
-                });
+        connectButton.addEventListener('click', () => {
+            const region = regionSelect.value;
+            if (!region) {
+                alert('Proszę wybrać województwo.');
+                return;
             }
-        }
+            connectButton.style.display = 'none';
+            regionSelect.style.display = 'none';
+            messages.innerHTML = 'Szukam nowego obcego...';
+            socket.emit('find partner', region);
+        });
 
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (input.value) {
+                socket.emit('message', input.value);
+                addMessage('Ty', input.value);
+                input.value = '';
+                socket.emit('stop typing');
             }
+        });
+
+        input.addEventListener('input', () => {
+            if (input.value) {
+                socket.emit('typing');
+            } else {
+                socket.emit('stop typing');
+            }
+        });
+
+        socket.on('message', (msg) => {
+            addMessage(msg.user, msg.text);
+        });
+
+        socket.on('partner found', (partnerName) => {
+            messages.innerHTML = 'Połączono z ' + partnerName + '.';
+            form.style.display = 'flex';
+        });
+
+        socket.on('partner disconnected', () => {
+            messages.innerHTML = 'Twój partner się rozłączył. Szukam nowego partnera...';
+            form.style.display = 'none';
+            typingIndicator.style.display = 'none';
+            socket.emit('find partner', regionSelect.value);
+        });
+
+        socket.on('typing', () => {
+            typingIndicator.style.display = 'block';
+        });
+
+        socket.on('stop typing', () => {
+            typingIndicator.style.display = 'none';
+        });
+
+        socket.on('online users', (count) => {
+            onlineCount.textContent = count;
+            onlineUsers.classList.add('highlight');
+            setTimeout(() => onlineUsers.classList.remove('highlight'), 500);
+        });
+
+        function addMessage(user, text) {
+            const item = document.createElement('div');
+            item.classList.add('message');
+            item.innerHTML = `<strong>${user}:</strong> ${text}`;
+            messages.appendChild(item);
+            messages.scrollTop = messages.scrollHeight;
         }
     </script>
 </body>
-
 </html>
