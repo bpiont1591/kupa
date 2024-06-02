@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,13 +11,14 @@
 <body>
     <div id="chat-container">
         <header>
-            <h1>czatpogaduszki.pl</h1>
+            <img src="logo.png" alt="czatpogaduszki.pl" id="logo">
             <div id="online-users" class="online-users"><i class="fas fa-user"></i> <span id="online-count">0</span></div>
         </header>
         <main>
+            <p id="intro-text">Wystarczy, że klikniesz „Połącz z obcym”, aby rozpocząć anonimową rozmowę z losowo wybraną osobą. Możesz również wybrać województwo, z którego chcesz znaleźć rozmówcę. Jeśli rozmowa Cię nie zaciekawi, zawsze możesz przejść do kolejnej. Życzymy udanych pogawędek! :)</p>
             <select id="region-select">
                 <option value="">Wybierz województwo</option>
-                <option value="całapolska">CałaPolska</option>
+                <option value="całapolska">Cała Polska</option>
                 <option value="dolnośląskie">Dolnośląskie</option>
                 <option value="kujawsko-pomorskie">Kujawsko-Pomorskie</option>
                 <option value="lubelskie">Lubelskie</option>
@@ -36,6 +37,8 @@
                 <option value="zachodniopomorskie">Zachodniopomorskie</option>
             </select>
             <button id="connect-button">Połącz z obcym</button>
+            <button id="disconnect-button" style="display: none;">Rozłącz</button>
+            <button id="new-partner-button" style="display: none;">Połącz z nowym obcym</button>
             <div id="messages-container">
                 <div id="messages"></div>
                 <div id="typing" style="display: none;">Obcy pisze...</div>
@@ -52,8 +55,11 @@
         const socket = io();
 
         const connectButton = document.getElementById('connect-button');
+        const disconnectButton = document.getElementById('disconnect-button');
+        const newPartnerButton = document.getElementById('new-partner-button');
         const form = document.getElementById('message-form');
         const input = document.getElementById('message-input');
+        const messagesContainer = document.getElementById('messages-container');
         const messages = document.getElementById('messages');
         const typingIndicator = document.getElementById('typing');
         const onlineUsers = document.getElementById('online-users');
@@ -70,6 +76,22 @@
             regionSelect.style.display = 'none';
             messages.innerHTML = 'Szukam nowego obcego...';
             socket.emit('find partner', region);
+        });
+
+        disconnectButton.addEventListener('click', () => {
+            socket.emit('disconnect partner');
+            form.style.display = 'none';
+            typingIndicator.style.display = 'none';
+            messages.innerHTML = 'Rozłączono. Możesz połączyć się z nowym obcym.';
+            disconnectButton.style.display = 'none';
+            newPartnerButton.style.display = 'block';
+        });
+
+        newPartnerButton.addEventListener('click', () => {
+            const region = regionSelect.value;
+            messages.innerHTML = 'Szukam nowego obcego...';
+            socket.emit('find partner', region);
+            newPartnerButton.style.display = 'none';
         });
 
         form.addEventListener('submit', (e) => {
@@ -97,12 +119,16 @@
         socket.on('partner found', (partnerName) => {
             messages.innerHTML = 'Połączono z ' + partnerName + '.';
             form.style.display = 'flex';
+            disconnectButton.style.display = 'block';
+            newPartnerButton.style.display = 'none';
         });
 
         socket.on('partner disconnected', () => {
             messages.innerHTML = 'Twój partner się rozłączył. Szukam nowego partnera...';
             form.style.display = 'none';
             typingIndicator.style.display = 'none';
+            disconnectButton.style.display = 'none';
+            newPartnerButton.style.display = 'block';
             socket.emit('find partner', regionSelect.value);
         });
 
@@ -125,7 +151,8 @@
             item.classList.add('message');
             item.innerHTML = `<strong>${user}:</strong> ${text}`;
             messages.appendChild(item);
-            messages.scrollTop = messages.scrollHeight;
+            // Scroll to the bottom of the messages container
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
     </script>
 </body>
