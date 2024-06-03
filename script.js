@@ -49,8 +49,7 @@ disconnectButton.addEventListener('click', () => {
     messages.innerHTML = 'Rozłączono. Możesz połączyć się z nowym obcym.';
     disconnectButton.style.display = 'none';
     newPartnerButton.style.display = 'block';
-    document.body.classList.remove('expanded');
-    chatContainer.classList.remove('expanded');
+    // Usunięto usuwanie klas expanded
 });
 
 newPartnerButton.addEventListener('click', () => {
@@ -87,8 +86,7 @@ socket.on('partner found', (partnerName) => {
     form.style.display = 'flex';
     disconnectButton.style.display = 'block';
     newPartnerButton.style.display = 'none';
-    document.body.classList.add('expanded');
-    chatContainer.classList.add('expanded');
+    // Usunięto dodawanie klas expanded, ponieważ są już dodane w HTML
 });
 
 socket.on('partner disconnected', () => {
@@ -98,8 +96,6 @@ socket.on('partner disconnected', () => {
     disconnectButton.style.display = 'none';
     newPartnerButton.style.display = 'block';
     socket.emit('find partner', regionSelect.value);
-    document.body.classList.remove('expanded');
-    chatContainer.classList.remove('expanded');
 });
 
 socket.on('typing', () => {

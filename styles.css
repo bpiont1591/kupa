@@ -5,10 +5,11 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh; /* changed from height to min-height */
+    min-height: 100vh;
     margin: 0;
     padding: 0 10px;
     animation: fadeIn 1s ease-in-out;
+    overflow: hidden; /* Dodane, aby domyślnie ukrywać przewijanie */
 }
 
 @keyframes fadeIn {
@@ -22,29 +23,16 @@ body {
 
 #chat-container {
     background: #2a2a3b;
-    border-radius: 15px;
+    border-radius: 0; /* Usunięte zaokrąglenie */
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     width: 100%;
-    max-width: 800px;
-    max-height: 90vh;
+    height: 100vh; /* Zmiana na pełną wysokość */
     overflow: hidden;
     display: flex;
     flex-direction: column;
     animation: slideIn 0.5s ease-in-out;
     border: 1px solid #444;
     transition: all 0.5s ease-in-out;
-}
-
-#chat-container.expanded {
-    width: 100%;
-    height: 100vh;
-    max-width: none;
-    max-height: none;
-    border-radius: 0;
-}
-
-body.expanded {
-    overflow: hidden;
 }
 
 @keyframes slideIn {
@@ -64,7 +52,6 @@ header {
     padding: 25px;
     text-align: center;
     border-bottom: 1px solid #444;
-    border-radius: 15px 15px 0 0;
 }
 
 #top-bar {
