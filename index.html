@@ -3,16 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>czatpogaduszki.pl</title>
+    <title>czatpogaduszki.pl - Anonimowy Czat z Obcymi</title>
+    <meta name="description" content="Czatpogaduszki.pl to miejsce, gdzie możesz anonimowo porozmawiać z losowo wybraną osobą z różnych regionów Polski. Dołącz do rozmowy już teraz!">
+    <meta name="keywords" content="czat, anonimowy czat, rozmawiaj z obcymi, czat online, czat z nieznajomymi, pogawędki, rozmowy">
+    <meta name="robots" content="index, follow">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <div id="chat-container">
+<body class="expanded">
+    <div id="chat-container" class="expanded">
         <header>
-            <img src="logo.png" alt="czatpogaduszki.pl" id="logo">
-            <div id="online-users" class="online-users"><i class="fas fa-user"></i> <span id="online-count">0</span></div>
+            <div id="top-bar">
+                <img src="logo.png" alt="czatpogaduszki.pl" id="logo">
+                <div id="online-users"><i class="fas fa-user"></i> <span id="online-count">0</span> </div>
+            </div>
         </header>
         <main>
             <p id="intro-text">Wystarczy, że klikniesz „Połącz z obcym”, aby rozpocząć anonimową rozmowę z losowo wybraną osobą. Możesz również wybrać województwo, z którego chcesz znaleźć rozmówcę. Jeśli rozmowa Cię nie zaciekawi, zawsze możesz przejść do kolejnej. Życzymy udanych pogawędek! :)</p>
@@ -48,112 +53,25 @@
                 <button type="submit">Wyślij</button>
             </form>
             <button id="discord-button" onclick="window.open('https://discord.com/invite/mbQcmFzAjs', '_blank')">Dołącz do nas na Discordzie</button>
+            <div id="announcements">
+                <h2>Ogłoszenia</h2>
+                <div class="announcement" id="announcement-1">
+                    <p>Ogłoszenie 1: Szukam chłopa, który gadał ze mną od około 1 do około 6.30, póki mi neta nie wywaliło. Rozmowa zaczynała się od tego ile masz wiosen i powiedziałeś, że 420. Natomiast kończyła się na zrobieniu kawy i przysiadach, które miałam zrobić, potem mnie wywaliło. Po drodze gadaliśmy o wybaczaniu, twoich kotach i moich, często dochodziło do walk między nami oraz mówiłeś, że starałeś się dostać do szkoły komików( co nie wiem czy nie było żartem). Jeżeli chcesz to odezwij się.</p>
+                </div>
+                <div class="announcement" id="announcement-2" style="display: none;">
+                    <p>Ogłoszenie 2: Pozdrawiam Wikę z Torunia, przyszłą panią adwokat 😉 Pisaliśmy prawie że do białego rana. Jeśli nadal jesteś chętna na tą kiedyś tam wycieczkę do Krakowa to odezwij się w jakiś sposób</p>
+                </div>
+                <div class="announcement" id="announcement-3" style="display: none;">
+                    <p>Ogłoszenie 3: Pozdrowienia dla dziewczyny co jeździ mazdą 6 i lubi nocne spacery. Pozdrawia Grzegorz</p>
+                </div>
+                <div id="announcement-controls">
+                    <button id="prev-announcement">Poprzednie</button>
+                    <button id="next-announcement">Następne</button>
+                </div>
+            </div>
         </main>
     </div>
     <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const socket = io();
-
-        const connectButton = document.getElementById('connect-button');
-        const disconnectButton = document.getElementById('disconnect-button');
-        const newPartnerButton = document.getElementById('new-partner-button');
-        const form = document.getElementById('message-form');
-        const input = document.getElementById('message-input');
-        const messagesContainer = document.getElementById('messages-container');
-        const messages = document.getElementById('messages');
-        const typingIndicator = document.getElementById('typing');
-        const onlineUsers = document.getElementById('online-users');
-        const onlineCount = document.getElementById('online-count');
-        const regionSelect = document.getElementById('region-select');
-
-        connectButton.addEventListener('click', () => {
-            const region = regionSelect.value;
-            if (!region) {
-                alert('Proszę wybrać województwo.');
-                return;
-            }
-            connectButton.style.display = 'none';
-            regionSelect.style.display = 'none';
-            messages.innerHTML = 'Szukam nowego obcego...';
-            socket.emit('find partner', region);
-        });
-
-        disconnectButton.addEventListener('click', () => {
-            socket.emit('disconnect partner');
-            form.style.display = 'none';
-            typingIndicator.style.display = 'none';
-            messages.innerHTML = 'Rozłączono. Możesz połączyć się z nowym obcym.';
-            disconnectButton.style.display = 'none';
-            newPartnerButton.style.display = 'block';
-        });
-
-        newPartnerButton.addEventListener('click', () => {
-            const region = regionSelect.value;
-            messages.innerHTML = 'Szukam nowego obcego...';
-            socket.emit('find partner', region);
-            newPartnerButton.style.display = 'none';
-        });
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (input.value) {
-                socket.emit('message', input.value);
-                addMessage('Ty', input.value);
-                input.value = '';
-                socket.emit('stop typing');
-            }
-        });
-
-        input.addEventListener('input', () => {
-            if (input.value) {
-                socket.emit('typing');
-            } else {
-                socket.emit('stop typing');
-            }
-        });
-
-        socket.on('message', (msg) => {
-            addMessage(msg.user, msg.text);
-        });
-
-        socket.on('partner found', (partnerName) => {
-            messages.innerHTML = 'Połączono z ' + partnerName + '.';
-            form.style.display = 'flex';
-            disconnectButton.style.display = 'block';
-            newPartnerButton.style.display = 'none';
-        });
-
-        socket.on('partner disconnected', () => {
-            messages.innerHTML = 'Twój partner się rozłączył. Szukam nowego partnera...';
-            form.style.display = 'none';
-            typingIndicator.style.display = 'none';
-            disconnectButton.style.display = 'none';
-            newPartnerButton.style.display = 'block';
-            socket.emit('find partner', regionSelect.value);
-        });
-
-        socket.on('typing', () => {
-            typingIndicator.style.display = 'block';
-        });
-
-        socket.on('stop typing', () => {
-            typingIndicator.style.display = 'none';
-        });
-
-        socket.on('online users', (count) => {
-            onlineCount.textContent = count;
-            onlineUsers.classList.add('highlight');
-            setTimeout(() => onlineUsers.classList.remove('highlight'), 500);
-        });
-
-        function addMessage(user, text) {
-            const item = document.createElement('div');
-            item.classList.add('message');
-            item.innerHTML = `<strong>${user}:</strong> ${text}`;
-            messages.appendChild(item);
-            // Scroll to the bottom of the messages container
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>

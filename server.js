@@ -9,8 +9,9 @@ const io = socketIo(server);
 
 let onlineUsers = 0;
 let waitingUsers = {};
-let lastPartners = {}; // przechowuje ostatnich partnerów dla każdego użytkownika
+let lastPartners = {}; // Przechowuje ostatnich partnerów dla każdego użytkownika
 
+// Serwowanie plików statycznych
 app.use(express.static(__dirname));
 
 app.get('/', (req, res) => {
@@ -22,50 +23,56 @@ io.on('connection', (socket) => {
     io.emit('online users', onlineUsers);
     console.log('Nowy użytkownik połączony');
 
+    // Obsługa żądania znalezienia partnera
     socket.on('find partner', (region) => {
         if (!waitingUsers[region]) {
             waitingUsers[region] = [];
         }
 
-        if (waitingUsers[region].length > 0) {
-            let partnerSocketId;
-            let partnerSocket;
-            do {
-                partnerSocketId = waitingUsers[region].pop();
-                partnerSocket = io.sockets.sockets.get(partnerSocketId);
-            } while (partnerSocketId === socket.id || (lastPartners[socket.id] && lastPartners[socket.id].includes(partnerSocketId)));
+        let partnerSocketId = null;
+        let partnerSocket = null;
 
-            if (partnerSocket) {
-                socket.partner = partnerSocket;
-                partnerSocket.partner = socket;
+        while (waitingUsers[region].length > 0) {
+            partnerSocketId = waitingUsers[region].pop();
+            partnerSocket = io.sockets.sockets.get(partnerSocketId);
 
-                if (!lastPartners[socket.id]) {
-                    lastPartners[socket.id] = [];
-                }
-                if (!lastPartners[partnerSocketId]) {
-                    lastPartners[partnerSocketId] = [];
-                }
-
-                lastPartners[socket.id].push(partnerSocketId);
-                lastPartners[partnerSocketId].push(socket.id);
-
-                if (lastPartners[socket.id].length > 5) {
-                    lastPartners[socket.id].shift();
-                }
-                if (lastPartners[partnerSocketId].length > 5) {
-                    lastPartners[partnerSocketId].shift();
-                }
-
-                socket.emit('partner found', 'Obcy');
-                partnerSocket.emit('partner found', 'Obcy');
-            } else {
-                waitingUsers[region].push(socket.id);
+            if (partnerSocketId !== socket.id && !(lastPartners[socket.id] && lastPartners[socket.id].includes(partnerSocketId))) {
+                break;
             }
+
+            partnerSocketId = null;
+            partnerSocket = null;
+        }
+
+        if (partnerSocket) {
+            socket.partner = partnerSocket;
+            partnerSocket.partner = socket;
+
+            if (!lastPartners[socket.id]) {
+                lastPartners[socket.id] = [];
+            }
+            if (!lastPartners[partnerSocketId]) {
+                lastPartners[partnerSocketId] = [];
+            }
+
+            lastPartners[socket.id].push(partnerSocketId);
+            lastPartners[partnerSocketId].push(socket.id);
+
+            if (lastPartners[socket.id].length > 5) {
+                lastPartners[socket.id].shift();
+            }
+            if (lastPartners[partnerSocketId].length > 5) {
+                lastPartners[partnerSocketId].shift();
+            }
+
+            socket.emit('partner found', 'Obcy');
+            partnerSocket.emit('partner found', 'Obcy');
         } else {
             waitingUsers[region].push(socket.id);
         }
     });
 
+    // Obsługa rozłączenia z partnerem
     socket.on('disconnect partner', () => {
         if (socket.partner) {
             socket.partner.emit('partner disconnected');
@@ -79,12 +86,14 @@ io.on('connection', (socket) => {
         socket.emit('find partner', region);
     });
 
+    // Obsługa wiadomości
     socket.on('message', (msg) => {
         if (socket.partner) {
             socket.partner.emit('message', { user: 'Obcy', text: msg });
         }
     });
 
+    // Obsługa powiadomień o pisaniu
     socket.on('typing', () => {
         if (socket.partner) {
             socket.partner.emit('typing');
@@ -97,6 +106,7 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Obsługa rozłączenia użytkownika
     socket.on('disconnect', () => {
         onlineUsers--;
         io.emit('online users', onlineUsers);
