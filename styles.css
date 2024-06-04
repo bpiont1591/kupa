@@ -9,7 +9,7 @@ body {
     margin: 0;
     padding: 0 10px;
     animation: fadeIn 1s ease-in-out;
-    overflow: hidden; /* Dodane, aby domyślnie ukrywać przewijanie */
+    overflow: hidden;
 }
 
 @keyframes fadeIn {
@@ -23,10 +23,11 @@ body {
 
 #chat-container {
     background: #2a2a3b;
-    border-radius: 0; /* Usunięte zaokrąglenie */
+    border-radius: 15px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     width: 100%;
-    height: 100vh; /* Zmiana na pełną wysokość */
+    max-width: 1200px;
+    height: 90vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -49,7 +50,7 @@ body {
 header {
     background: #3a3a4a;
     color: #fff;
-    padding: 25px;
+    padding: 20px;
     text-align: center;
     border-bottom: 1px solid #444;
 }
@@ -71,15 +72,26 @@ header img:hover {
 }
 
 #online-users {
-    font-size: 0.9em;
-    background: #444;
-    padding: 5px 10px;
-    border-radius: 20px;
-    transition: background 0.3s ease-in-out;
+    font-size: 1em;
+    padding: 8px 15px;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
-#online-users:hover {
-    background: #555;
+#online-users i {
+    margin-right: 8px;
+    font-size: 1.2em;
+    color: #fff;
+}
+
+#online-users span {
+    background: #1e1e2f;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: bold;
+    color: #fff;
 }
 
 main {
@@ -214,56 +226,56 @@ form button:hover {
     transition: background 0.3s ease-in-out;
 }
 
+#discord-button i {
+    margin-right: 8px;
+}
+
 #discord-button:hover {
     background: #5a6bb2;
 }
 
-#announcements {
-    background: #2a2a3b;
-    border-radius: 10px;
-    padding: 20px;
+.facebook-plugin-container {
     margin-top: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-}
-
-#announcements h2 {
-    margin-top: 0;
-    color: #fff;
     text-align: center;
-    margin-bottom: 15px;
 }
 
-.announcement {
+.facebook-plugin-container iframe {
+    border: none;
+    overflow: hidden;
+    background: #fff;
+}
+
+footer {
     background: #3a3a4a;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-}
-
-.announcement p {
-    margin: 0;
     color: #c9c9d3;
+    padding: 15px 20px;
+    text-align: center;
+    border-top: 1px solid #444;
 }
 
-#announcement-controls {
+#footer-content {
     display: flex;
     justify-content: space-between;
-    margin-top: 10px;
+    align-items: center;
 }
 
-#announcement-controls button {
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+#footer-content p {
+    margin: 0;
+}
+
+#social-icons {
+    display: flex;
+    gap: 10px;
+}
+
+#social-icons a {
+    color: #c9c9d3;
+    font-size: 1.5em;
+    transition: color 0.3s ease-in-out;
+}
+
+#social-icons a:hover {
     color: #fff;
-    border: none;
-    padding: 12px;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background 0.3s ease-in-out;
-}
-
-#announcement-controls button:hover {
-    background: linear-gradient(135deg, #0056b3 0%, #003f7f 100%);
 }
 
 /* Media Queries for Responsive Design */
@@ -298,6 +310,11 @@ form button:hover {
         font-size: 14px;
         padding: 8px;
     }
+
+    #footer-content {
+        flex-direction: column;
+        gap: 10px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -330,5 +347,54 @@ form button:hover {
     #message-input {
         font-size: 12px;
         padding: 6px;
+    }
+
+    #footer-content {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+.facebook-plugin-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.facebook-plugin-container iframe {
+    border: none;
+    overflow: hidden;
+    background: #fff;
+}
+
+/* Additional Media Queries and Enhancements */
+@media (max-width: 1024px) {
+    #chat-container {
+        height: auto;
+        max-height: 90vh;
+        margin: 10px 0;
+    }
+
+    main {
+        overflow-y: auto;
+    }
+
+    #messages-container {
+        height: 70vh;
+    }
+}
+
+@media (orientation: landscape) {
+    body {
+        flex-direction: row;
+    }
+
+    #chat-container {
+        flex: 1;
+        height: 100vh;
+        max-width: 100%;
+    }
+
+    #messages-container {
+        height: 80vh;
     }
 }

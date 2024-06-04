@@ -2,6 +2,11 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const csrf = require('csurf');
+const cookieParser = require('cookie-parser');
+const { body, validationResult } = require('express-validator');
 
 const app = express();
 const server = http.createServer(app);
@@ -11,11 +16,26 @@ let onlineUsers = 0;
 let waitingUsers = {};
 let lastPartners = {}; // Przechowuje ostatnich partnerów dla każdego użytkownika
 
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(helmet());
+app.use(cookieParser());
+app.use(csrf({ cookie: true }));
+
+// Rate limiter
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: 'Too many requests, please try again later.'
+});
+app.use(apiLimiter);
+
 // Serwowanie plików statycznych
 app.use(express.static(__dirname));
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'), { csrfToken: req.csrfToken() });
 });
 
 io.on('connection', (socket) => {
@@ -25,6 +45,13 @@ io.on('connection', (socket) => {
 
     // Obsługa żądania znalezienia partnera
     socket.on('find partner', (region) => {
+        if (typeof region !== 'string' || region.trim() === '') {
+            socket.emit('error', { message: 'Invalid region' });
+            return;
+        }
+
+        region = region.trim();
+
         if (!waitingUsers[region]) {
             waitingUsers[region] = [];
         }
@@ -88,6 +115,13 @@ io.on('connection', (socket) => {
 
     // Obsługa wiadomości
     socket.on('message', (msg) => {
+        if (typeof msg !== 'string' || msg.trim() === '') {
+            socket.emit('error', { message: 'Invalid message' });
+            return;
+        }
+
+        msg = msg.trim();
+
         if (socket.partner) {
             socket.partner.emit('message', { user: 'Obcy', text: msg });
         }

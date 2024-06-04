@@ -13,22 +13,18 @@ const onlineCount = document.getElementById('online-count');
 const regionSelect = document.getElementById('region-select');
 const chatContainer = document.getElementById('chat-container');
 
-const prevAnnouncementButton = document.getElementById('prev-announcement');
-const nextAnnouncementButton = document.getElementById('next-announcement');
-const announcements = document.querySelectorAll('.announcement');
-let currentAnnouncementIndex = 0;
+form.style.display = 'none';
+disconnectButton.style.display = 'none';
+newPartnerButton.style.display = 'none';
+typingIndicator.style.display = 'none';
 
-prevAnnouncementButton.addEventListener('click', () => {
-    announcements[currentAnnouncementIndex].style.display = 'none';
-    currentAnnouncementIndex = (currentAnnouncementIndex - 1 + announcements.length) % announcements.length;
-    announcements[currentAnnouncementIndex].style.display = 'block';
-});
+function escapeHTML(string) {
+    const div = document.createElement('div');
+    div.appendChild(document.createTextNode(string));
+    return div.innerHTML;
+}
 
-nextAnnouncementButton.addEventListener('click', () => {
-    announcements[currentAnnouncementIndex].style.display = 'none';
-    currentAnnouncementIndex = (currentAnnouncementIndex + 1) % announcements.length;
-    announcements[currentAnnouncementIndex].style.display = 'block';
-});
+let messageTimeout;
 
 connectButton.addEventListener('click', () => {
     const region = regionSelect.value;
@@ -49,7 +45,6 @@ disconnectButton.addEventListener('click', () => {
     messages.innerHTML = 'Rozłączono. Możesz połączyć się z nowym obcym.';
     disconnectButton.style.display = 'none';
     newPartnerButton.style.display = 'block';
-    // Usunięto usuwanie klas expanded
 });
 
 newPartnerButton.addEventListener('click', () => {
@@ -61,32 +56,37 @@ newPartnerButton.addEventListener('click', () => {
 
 form.addEventListener('submit', (e) => {
     e.preventDefault();
-    if (input.value) {
-        socket.emit('message', input.value);
-        addMessage('Ty', input.value);
+    const message = escapeHTML(input.value);
+    if (message) {
+        clearTimeout(messageTimeout);  // Clear previous timeout
+        socket.emit('message', message);
+        addMessage('Ty', message);
         input.value = '';
         socket.emit('stop typing');
     }
 });
 
 input.addEventListener('input', () => {
+    clearTimeout(messageTimeout);  // Clear previous timeout
     if (input.value) {
         socket.emit('typing');
+        messageTimeout = setTimeout(() => {
+            socket.emit('stop typing');
+        }, 3000);  // Stop typing after 3 seconds of inactivity
     } else {
         socket.emit('stop typing');
     }
 });
 
 socket.on('message', (msg) => {
-    addMessage(msg.user, msg.text);
+    addMessage(escapeHTML(msg.user), escapeHTML(msg.text));
 });
 
 socket.on('partner found', (partnerName) => {
-    messages.innerHTML = 'Połączono z ' + partnerName + '.';
+    messages.innerHTML = 'Połączono z ' + escapeHTML(partnerName) + '.';
     form.style.display = 'flex';
     disconnectButton.style.display = 'block';
     newPartnerButton.style.display = 'none';
-    // Usunięto dodawanie klas expanded, ponieważ są już dodane w HTML
 });
 
 socket.on('partner disconnected', () => {
@@ -112,11 +112,15 @@ socket.on('online users', (count) => {
     setTimeout(() => onlineUsers.classList.remove('highlight'), 500);
 });
 
+socket.on('error', (error) => {
+    console.error('Error received from server:', error);
+    alert('Wystąpił błąd: ' + error.message);
+});
+
 function addMessage(user, text) {
     const item = document.createElement('div');
     item.classList.add('message');
-    item.innerHTML = `<strong>${user}:</strong> ${text}`;
+    item.innerHTML = `<strong>${escapeHTML(user)}:</strong> ${escapeHTML(text)}`;
     messages.appendChild(item);
-    // Scroll to the bottom of the messages container
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
