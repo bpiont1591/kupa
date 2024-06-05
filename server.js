@@ -16,6 +16,9 @@ let onlineUsers = 0;
 let waitingUsers = {};
 let lastPartners = {}; // Przechowuje ostatnich partnerów dla każdego użytkownika
 
+// Configure Express to trust proxies
+app.set('trust proxy', 1); // 1 here means trust the first proxy
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -31,7 +34,7 @@ const apiLimiter = rateLimit({
 });
 app.use(apiLimiter);
 
-// Serwowanie plików statycznych
+// Serve static files
 app.use(express.static(__dirname));
 
 app.get('/', (req, res) => {
