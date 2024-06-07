@@ -1,7 +1,8 @@
+/* Podstawowe style */
 body {
     font-family: 'Roboto', sans-serif;
-    background: linear-gradient(135deg, #1e1e2f 0%, #2a2a3b 100%);
-    color: #c9c9d3;
+    background: linear-gradient(135deg, #1e1e2f 0%, #3b3b5f 100%);
+    color: #e0e0eb;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -10,6 +11,7 @@ body {
     padding: 0 10px;
     animation: fadeIn 1s ease-in-out;
     overflow: hidden;
+    flex-direction: column;
 }
 
 @keyframes fadeIn {
@@ -22,17 +24,17 @@ body {
 }
 
 #chat-container {
-    background: #2a2a3b;
-    border-radius: 15px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    background: #2e2e4f;
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
     width: 100%;
-    max-width: 1200px;
-    height: 90vh;
+    max-width: 1000px;
+    height: 85vh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     animation: slideIn 0.5s ease-in-out;
-    border: 1px solid #444;
+    border: 2px solid #444;
     transition: all 0.5s ease-in-out;
 }
 
@@ -48,11 +50,11 @@ body {
 }
 
 header {
-    background: #3a3a4a;
+    background: #383863;
     color: #fff;
-    padding: 20px;
+    padding: 15px;
     text-align: center;
-    border-bottom: 1px solid #444;
+    border-bottom: 2px solid #444;
 }
 
 #top-bar {
@@ -62,7 +64,7 @@ header {
 }
 
 header img {
-    max-width: 150px;
+    max-width: 120px;
     height: auto;
     transition: transform 0.3s ease-in-out;
 }
@@ -73,22 +75,23 @@ header img:hover {
 
 #online-users {
     font-size: 1em;
-    padding: 8px 15px;
+    padding: 10px 20px;
     border-radius: 25px;
     display: flex;
     align-items: center;
+    color: #fff;
     transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
 #online-users i {
-    margin-right: 8px;
+    margin-right: 10px;
     font-size: 1.2em;
     color: #fff;
 }
 
 #online-users span {
-    background: #1e1e2f;
-    padding: 2px 8px;
+    background: #007bff;
+    padding: 3px 10px;
     border-radius: 12px;
     font-weight: bold;
     color: #fff;
@@ -102,14 +105,25 @@ main {
     overflow: hidden;
 }
 
-#intro-text {
-    background: #3a3a4a;
+#info-section {
+    background: #383863;
     border-radius: 10px;
     padding: 20px;
     margin-bottom: 15px;
     text-align: center;
-    color: #c9c9d3;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    color: #e0e0eb;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+}
+
+
+#intro-text {
+    background: #383863;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 15px;
+    text-align: center;
+    color: #e0e0eb;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
 }
 
 #region-select, #connect-button, #disconnect-button, #new-partner-button {
@@ -117,20 +131,20 @@ main {
     padding: 12px;
     margin-bottom: 10px;
     border-radius: 10px;
-    border: 1px solid #555;
+    border: 1px solid #444;
     font-size: 1em;
-    background-color: #3a3a4a;
-    color: #c9c9d3;
+    background-color: #383863;
+    color: #e0e0eb;
     transition: background 0.3s ease-in-out, border-color 0.3s ease-in-out;
 }
 
 #region-select:focus, #connect-button:focus, #disconnect-button:focus, #new-partner-button:focus {
     outline: none;
-    border-color: #007bff;
+    border-color: #f39c12;
 }
 
 #connect-button, #disconnect-button, #new-partner-button {
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
     color: #fff;
     border: none;
     cursor: pointer;
@@ -139,35 +153,35 @@ main {
 }
 
 #connect-button:hover, #disconnect-button:hover, #new-partner-button:hover {
-    background: linear-gradient(135deg, #0056b3 0%, #003f7f 100%);
+    background: linear-gradient(135deg, #d35400 0%, #c0392b 100%);
 }
 
 #messages-container {
-    border: 1px solid #555;
+    border: 1px solid #444;
     border-radius: 10px;
     padding: 20px;
     height: 100%;
     overflow-y: auto;
-    background: #2a2a3b;
+    background: #2e2e4f;
     flex: 1;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
 }
 
 .message {
     padding: 10px;
     margin: 5px 0;
     border-radius: 10px;
-    background: #3a3a4a;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    background: #383863;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
     transition: background 0.3s ease-in-out;
 }
 
 .message strong {
-    color: #007bff;
+    color: #e67e22;
 }
 
 .message:hover {
-    background: #505070;
+    background: #505075;
 }
 
 #typing {
@@ -185,20 +199,20 @@ form {
     flex: 1;
     padding: 12px;
     border-radius: 10px;
-    border: 1px solid #555;
+    border: 1px solid #444;
     font-size: 1em;
-    background-color: #3a3a4a;
-    color: #c9c9d3;
+    background-color: #383863;
+    color: #e0e0eb;
     transition: border-color 0.3s ease-in-out, background 0.3s ease-in-out;
 }
 
 #message-input:focus {
-    border-color: #007bff;
-    background: #2a2a3b;
+    border-color: #f39c12;
+    background: #2e2e4f;
 }
 
 form button {
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
     color: #fff;
     border: none;
     padding: 12px;
@@ -209,7 +223,7 @@ form button {
 }
 
 form button:hover {
-    background: linear-gradient(135deg, #0056b3 0%, #003f7f 100%);
+    background: linear-gradient(135deg, #d35400 0%, #c0392b 100%);
 }
 
 #discord-button {
@@ -246,11 +260,11 @@ form button:hover {
 }
 
 footer {
-    background: #3a3a4a;
-    color: #c9c9d3;
+    background: #383863;
+    color: #e0e0eb;
     padding: 15px 20px;
     text-align: center;
-    border-top: 1px solid #444;
+    border-top: 2px solid #444;
 }
 
 #footer-content {
@@ -269,7 +283,7 @@ footer {
 }
 
 #social-icons a {
-    color: #c9c9d3;
+    color: #e0e0eb;
     font-size: 1.5em;
     transition: color 0.3s ease-in-out;
 }
@@ -278,46 +292,124 @@ footer {
     color: #fff;
 }
 
-/* Media Queries for Responsive Design */
-@media (max-width: 768px) {
-    header {
-        padding: 15px;
-    }
+/* Styl dla przycisku Dark Mode */
+#toggle-dark-mode {
+    background: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.3s ease-in-out;
+}
 
-    header img {
-        max-width: 120px;
+#toggle-dark-mode:hover {
+    background: #0056b3;
+}
+
+/* Light mode styles */
+body.light-mode {
+    background: linear-gradient(135deg, #f0f0f3 0%, #ffffff 100%);
+    color: #333;
+}
+
+body.light-mode #chat-container {
+    background: #fff;
+    border: 2px solid #ccc;
+}
+
+body.light-mode header {
+    background: #e0e0eb;
+    color: #333;
+}
+
+body.light-mode #online-users {
+    background: #f9f9fc;
+    color: #333;
+}
+
+body.light-mode #online-users span {
+    background: #007bff;
+    color: #fff;
+}
+
+body.light-mode #intro-text {
+    background: #e0e0eb;
+    color: #333;
+}
+
+body.light-mode #region-select,
+body.light-mode #connect-button,
+body.light-mode #disconnect-button,
+body.light-mode #new-partner-button {
+    background: #e0e0eb;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+body.light-mode #connect-button:hover,
+body.light-mode #disconnect-button:hover,
+body.light-mode #new-partner-button:hover {
+    background: #cccccc;
+}
+
+body.light-mode #messages-container {
+    background: #f9f9fc;
+    border: 1px solid #ccc;
+    color: #333;
+}
+
+body.light-mode .message {
+    background: #e0e0eb;
+}
+
+body.light-mode .message strong {
+    color: #e67e22;
+}
+
+body.light-mode #message-input {
+    background: #e0e0eb;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+body.light-mode form button {
+    background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+    color: #fff;
+}
+
+body.light-mode form button:hover {
+    background: linear-gradient(135deg, #d35400 0%, #c0392b 100%);
+}
+
+body.light-mode footer {
+    background: #e0e0eb;
+    color: #333;
+}
+
+body.light-mode #social-icons a {
+    color: #333;
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 1024px) {
+    #chat-container {
+        max-width: 95%;
+        height: 80vh;
+        margin: 10px 0;
     }
 
     main {
-        padding: 15px;
+        overflow-y: auto;
     }
 
-    #intro-text {
-        font-size: 14px;
-    }
-
-    #region-select, #connect-button, #disconnect-button, #new-partner-button {
-        font-size: 14px;
-        padding: 8px;
-    }
-
-    form button {
-        font-size: 14px;
-        padding: 8px;
-    }
-
-    #message-input {
-        font-size: 14px;
-        padding: 8px;
-    }
-
-    #footer-content {
-        flex-direction: column;
-        gap: 10px;
+    #messages-container {
+        height: 65vh;
     }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     header {
         padding: 10px;
     }
@@ -331,22 +423,22 @@ footer {
     }
 
     #intro-text {
-        font-size: 12px;
+        font-size: 14px;
     }
 
     #region-select, #connect-button, #disconnect-button, #new-partner-button {
-        font-size: 12px;
-        padding: 6px;
+        font-size: 14px;
+        padding: 10px;
     }
 
     form button {
-        font-size: 12px;
-        padding: 6px;
+        font-size: 14px;
+        padding: 10px;
     }
 
     #message-input {
-        font-size: 12px;
-        padding: 6px;
+        font-size: 14px;
+        padding: 10px;
     }
 
     #footer-content {
@@ -355,27 +447,46 @@ footer {
     }
 }
 
-.facebook-plugin-container {
-    margin-top: 20px;
-    text-align: center;
-}
+@media (max-width: 480px) {
+    header {
+        padding: 8px;
+    }
 
-.facebook-plugin-container iframe {
-    border: none;
-    overflow: hidden;
-    background: #fff;
-}
-
-/* Additional Media Queries and Enhancements */
-@media (max-width: 1024px) {
-    #chat-container {
-        height: auto;
-        max-height: 90vh;
-        margin: 10px 0;
+    header img {
+        max-width: 80px;
     }
 
     main {
-        overflow-y: auto;
+        padding: 8px;
+    }
+
+    #intro-text {
+        font-size: 12px;
+    }
+
+    #region-select, #connect-button, #disconnect-button, #new-partner-button {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    form button {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    #message-input {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    #footer-content {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    #chat-container {
+        max-width: 100%;
+        height: 90vh;
     }
 
     #messages-container {
@@ -397,4 +508,39 @@ footer {
     #messages-container {
         height: 80vh;
     }
+}
+
+/* Styl dla modala */
+#terms-modal {
+    display: none; /* Ukryj modal domyślnie */
+    position: fixed; 
+    z-index: 1000; /* Wysoki indeks aby modal był na wierzchu */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5); /* Ciemne tło */
+}
+
+/* Styl dla zawartości modala */
+#terms-modal-content {
+    background-color: #1a1a2a;
+    margin: 15% auto; /* 15% od góry i auto marginesy boczne aby wycentrować */
+    padding: 20px;
+    width: 80%; /* Szerokość 80% */
+    max-width: 600px; /* Maksymalna szerokość */
+}
+
+/* Styl dla nagłówka modala */
+#terms-modal-header {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+/* Styl dla przycisków w modalu */
+#terms-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
 }

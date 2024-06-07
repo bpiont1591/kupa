@@ -1,3 +1,32 @@
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    var termsModal = document.getElementById('terms-modal');
+    var acceptButton = document.getElementById('accept-terms-button');
+    var declineButton = document.getElementById('decline-terms-button');
+
+    // Show the modal
+    termsModal.style.display = 'block';
+
+    acceptButton.onclick = function() {
+        termsModal.style.display = 'none';
+    }
+
+    declineButton.onclick = function() {
+        alert('Musisz zaakceptować regulamin i politykę prywatności, aby korzystać z serwisu.');
+        window.location.href = 'https://www.google.com'; // Redirect to another site or show a message
+    }
+
+    window.onclick = function(event) {
+        if (event.target == termsModal) {
+            alert('Musisz zaakceptować regulamin i politykę prywatności, aby korzystać z serwisu.');
+            window.location.href = 'https://www.google.com';
+        }
+    }
+});
+
+
+
 const socket = io();
 
 const connectButton = document.getElementById('connect-button');

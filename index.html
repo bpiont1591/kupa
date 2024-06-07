@@ -1,1 +1,97 @@
-<!doctypehtml><html lang=pl><meta charset=UTF-8><meta content="width=device-width,initial-scale=1"name=viewport><title>czatpogaduszki.pl - Anonimowy Czat z Obcymi</title><meta content="Czatpogaduszki.pl to miejsce, gdzie możesz anonimowo porozmawiać z losowo wybraną osobą z różnych regionów Polski. Dołącz do rozmowy już teraz!"name=description><meta content="czat, anonimowy czat, rozmawiaj z obcymi, czat online, czat z nieznajomymi, pogawędki, rozmowy"name=keywords><meta content="index, follow"name=robots><link href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css rel=stylesheet><link href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css rel=stylesheet crossorigin=anonymous integrity=sha384-SZXxX4whJ79/GFf6XP4Xdu9f6p38lfik4zeb7owU3Kj44xYO8CR1aP8qKfvgpD5y><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap"rel=stylesheet><link href=styles.css rel=stylesheet><meta content=nosniff http-equiv=X-Content-Type-Options><meta content=DENY http-equiv=X-Frame-Options><meta content="1; mode=block"http-equiv=X-XSS-Protection><meta content="max-age=31536000; includeSubDomains"http-equiv=Strict-Transport-Security><div id=chat-container><header><div id=top-bar><img alt=czatpogaduszki.pl id=logo src=logo.png><div id=online-users class=user-status><i class="fa-user fas"></i> <span id=online-count>0</span></div></div></header><main><p id=intro-text>Wystarczy, że klikniesz „Połącz z obcym”, aby rozpocząć anonimową rozmowę z losowo wybraną osobą. Możesz również wybrać województwo, z którego chcesz znaleźć rozmówcę. Jeśli rozmowa Cię nie zaciekawi, zawsze możesz przejść do kolejnej. Życzymy udanych pogawędek! :)</p><select id=region-select><option value="">Wybierz województwo<option value=całapolska>Cała Polska<option value=dolnośląskie>Dolnośląskie<option value=kujawsko-pomorskie>Kujawsko-Pomorskie<option value=lubelskie>Lubelskie<option value=lubuskie>Lubuskie<option value=łódzkie>Łódzkie<option value=małopolskie>Małopolskie<option value=mazowieckie>Mazowieckie<option value=opolskie>Opolskie<option value=podkarpackie>Podkarpackie<option value=podlaskie>Podlaskie<option value=pomorskie>Pomorskie<option value=śląskie>Śląskie<option value=świętokrzyskie>Świętokrzyskie<option value=warmińsko-mazurskie>Warmińsko-Mazurskie<option value=wielkopolskie>Wielkopolskie<option value=zachodniopomorskie>Zachodniopomorskie</select> <button id=connect-button>Połącz z obcym</button> <button id=disconnect-button style=display:none>Rozłącz</button> <button id=new-partner-button style=display:none>Połącz z nowym obcym</button><div id=messages-container><div id=messages></div><div id=typing style=display:none>Obcy pisze...</div></div><form id=message-form style=display:none><input autocomplete=off id=message-input placeholder="Wpisz wiadomość..."> <button type=submit>Wyślij</button></form></main><footer><div id=footer-content><p>© 2024 czatpogaduszki.pl - Wszystkie prawa zastrzeżone<div id=social-icons><a aria-label=Discord href=https://discord.com/invite/mbQcmFzAjs target=_blank><i class="fab fa-discord"></i></a> <a aria-label=Facebook href=https://www.facebook.com/czatpogaduszkipl target=_blank><i class="fab fa-facebook"></i></a></div></div></footer></div><script src=/socket.io/socket.io.js></script><script src=script.js defer></script>
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>czatpogaduszki.pl - Anonimowy Czat z Obcymi</title>
+    <meta name="description" content="Czatpogaduszki.pl to miejsce, gdzie możesz anonimowo porozmawiać z losowo wybraną osobą z różnych regionów Polski. Dołącz do rozmowy już teraz!">
+    <meta name="keywords" content="czat, anonimowy czat, rozmawiaj z obcymi, czat online, czat z nieznajomymi, pogawędki, rozmowy">
+    <meta name="robots" content="index, follow">
+    <link rel="icon" href="favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Additional Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Strict-Transport-Security" content="max-age=31536000; includeSubDomains">
+</head>
+<body>
+    <div id="chat-container">
+        <header>
+            <div id="top-bar">
+                <img src="logo.png" alt="czatpogaduszki.pl" id="logo">
+                <div id="online-users" class="user-status">
+                    <i class="fas fa-user"></i>
+                    <span id="online-count">0</span>
+                </div>
+            </div>
+        </header>
+        <!-- Sekcja Porady i Ciekawostki -->
+        <aside id="info-section">
+            <h2>Porady i Ciekawostki</h2>
+            <p>Pamiętaj, aby nie udostępniać swoich danych osobowych.</p>
+            <p>Jeśli czujesz się niekomfortowo, zawsze możesz zakończyć rozmowę i połączyć się z nowym rozmówcą.</p>
+        </aside>
+        <main>
+            <select id="region-select">
+                <option value="">Wybierz województwo</option>
+                <option value="całapolska">Cała Polska</option>
+                <option value="dolnośląskie">Dolnośląskie</option>
+                <option value="kujawsko-pomorskie">Kujawsko-Pomorskie</option>
+                <option value="lubelskie">Lubelskie</option>
+                <option value="lubuskie">Lubuskie</option>
+                <option value="łódzkie">Łódzkie</option>
+                <option value="małopolskie">Małopolskie</option>
+                <option value="mazowieckie">Mazowieckie</option>
+                <option value="opolskie">Opolskie</option>
+                <option value="podkarpackie">Podkarpackie</option>
+                <option value="podlaskie">Podlaskie</option>
+                <option value="pomorskie">Pomorskie</option>
+                <option value="śląskie">Śląskie</option>
+                <option value="świętokrzyskie">Świętokrzyskie</option>
+                <option value="warmińsko-mazurskie">Warmińsko-Mazurskie</option>
+                <option value="wielkopolskie">Wielkopolskie</option>
+                <option value="zachodniopomorskie">Zachodniopomorskie</option>
+            </select>
+            <button id="connect-button">Połącz z obcym</button>
+            <button id="disconnect-button" style="display: none;">Rozłącz</button>
+            <button id="new-partner-button" style="display: none;">Połącz z nowym obcym</button>
+            <div id="messages-container">
+                <div id="messages"></div>
+                <div id="typing" style="display: none;">Obcy pisze...</div>
+            </div>
+            <form id="message-form" style="display: none;">
+                <input id="message-input" type="text" placeholder="Wpisz wiadomość..." autocomplete="off">
+                <button type="submit">Wyślij</button>
+            </form>
+        </main>
+        <footer>
+            <div id="footer-content">
+                <p>&copy; 2024 czatpogaduszki.pl - Wszystkie prawa zastrzeżone</p>
+                <div id="social-icons">
+                    <a href="https://discord.com/invite/mbQcmFzAjs" target="_blank" aria-label="Discord"><i class="fab fa-discord"></i></a>
+                    <a href="https://www.facebook.com/czatpogaduszkipl" target="_blank" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+   <!-- Terms and Conditions Modal -->
+   <div id="terms-modal">
+    <div id="terms-modal-content">
+        <div id="terms-modal-header">Regulamin i Polityka Prywatności</div>
+        <div id="terms-modal-body">
+            <p>Osoby korzystające z czatpogaduszki.pl muszą zaakceptować <a href="regulamin.html" target="_blank" style="font-weight: bold; color: white; background-color: #007BFF; padding: 5px 10px; border-radius: 5px; text-decoration: none;">regulamin</a> (kliknij aby przeczytać). Akceptując go, potwierdzasz, że masz ukończone 18 lat lub że masz ukończone 15 lat oraz zgodę rodziców/opiekunów prawnych na korzystanie z tego serwisu.</p>
+        </div>
+        <div id="terms-modal-footer">
+            <button id="accept-terms-button">Akceptuję</button>
+            <button id="decline-terms-button">Nie akceptuję</button>
+        </div>
+    </div>
+</div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js" defer></script>
+</body>
+</html>
