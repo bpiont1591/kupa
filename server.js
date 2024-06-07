@@ -7,6 +7,7 @@ const rateLimit = require('express-rate-limit');
 const csrf = require('csurf');
 const cookieParser = require('cookie-parser');
 const { body, validationResult } = require('express-validator');
+const morgan = require('morgan');
 
 const app = express();
 const server = http.createServer(app);
@@ -14,12 +15,13 @@ const io = socketIo(server);
 
 let onlineUsers = 0;
 let waitingUsers = {};
-let lastPartners = {}; // Przechowuje ostatnich partnerów dla każdego użytkownika
+let lastPartners = {}; // Stores last partners for each user
 
 // Configure Express to trust proxies
 app.set('trust proxy', 1); // 1 here means trust the first proxy
 
 // Middleware
+app.use(morgan('combined'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
@@ -41,12 +43,18 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'), { csrfToken: req.csrfToken() });
 });
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+});
+
 io.on('connection', (socket) => {
     onlineUsers++;
     io.emit('online users', onlineUsers);
-    console.log('Nowy użytkownik połączony');
+    console.log('New user connected');
 
-    // Obsługa żądania znalezienia partnera
+    // Handle partner request
     socket.on('find partner', (region) => {
         if (typeof region !== 'string' || region.trim() === '') {
             socket.emit('error', { message: 'Invalid region' });
@@ -102,7 +110,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Obsługa rozłączenia z partnerem
+    // Handle partner disconnection
     socket.on('disconnect partner', () => {
         if (socket.partner) {
             socket.partner.emit('partner disconnected');
@@ -116,7 +124,7 @@ io.on('connection', (socket) => {
         socket.emit('find partner', region);
     });
 
-    // Obsługa wiadomości
+    // Handle messages
     socket.on('message', (msg) => {
         if (typeof msg !== 'string' || msg.trim() === '') {
             socket.emit('error', { message: 'Invalid message' });
@@ -130,7 +138,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Obsługa powiadomień o pisaniu
+    // Handle typing notifications
     socket.on('typing', () => {
         if (socket.partner) {
             socket.partner.emit('typing');
@@ -143,11 +151,11 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Obsługa rozłączenia użytkownika
+    // Handle user disconnection
     socket.on('disconnect', () => {
         onlineUsers--;
         io.emit('online users', onlineUsers);
-        console.log('Użytkownik rozłączony');
+        console.log('User disconnected');
         if (socket.partner) {
             socket.partner.emit('partner disconnected');
             socket.partner.partner = null;
@@ -163,5 +171,5 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-    console.log(`Serwer działa na porcie ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
