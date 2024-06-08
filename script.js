@@ -1,5 +1,3 @@
-
-
 document.addEventListener('DOMContentLoaded', function () {
     var termsModal = document.getElementById('terms-modal');
     var acceptButton = document.getElementById('accept-terms-button');
@@ -23,9 +21,17 @@ document.addEventListener('DOMContentLoaded', function () {
             window.location.href = 'https://www.google.com';
         }
     }
+
+    // Nowy kod do nasłuchiwania focus na polach tekstowych i textarea
+    var inputFields = document.querySelectorAll('input[type="text"], textarea');
+    inputFields.forEach(function(field) {
+        field.addEventListener('focus', function() {
+            if (window.AndroidInterface) {
+                window.AndroidInterface.onFocus();
+            }
+        });
+    });
 });
-
-
 
 const socket = io();
 
@@ -153,3 +159,4 @@ function addMessage(user, text) {
     messages.appendChild(item);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
+
