@@ -8,7 +8,7 @@ body {
     align-items: center;
     min-height: 100vh;
     margin: 0;
-    padding: 0 10px;
+    padding: 0;
     animation: fadeIn 1s ease-in-out;
     overflow: hidden;
     flex-direction: column;
@@ -28,9 +28,8 @@ body {
     border-radius: 20px;
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
     width: 100%;
-    max-width: 1000px;
+    max-width: 1200px;
     height: 85vh;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
     animation: slideIn 0.5s ease-in-out;
@@ -57,14 +56,8 @@ header {
     border-bottom: 2px solid #444;
 }
 
-#top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
 header img {
-    max-width: 120px;
+    max-width: 100px;
     height: auto;
     transition: transform 0.3s ease-in-out;
 }
@@ -105,18 +98,7 @@ main {
     overflow: hidden;
 }
 
-#info-section {
-    background: #383863;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 15px;
-    text-align: center;
-    color: #e0e0eb;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
-}
-
-
-#intro-text {
+#info-section, #intro-text {
     background: #383863;
     border-radius: 10px;
     padding: 20px;
@@ -395,8 +377,8 @@ body.light-mode #social-icons a {
 /* Media Queries for Responsive Design */
 @media (max-width: 1024px) {
     #chat-container {
-        max-width: 95%;
-        height: 80vh;
+        max-width: 100%;
+        height: 85vh;
         margin: 10px 0;
     }
 
@@ -415,7 +397,7 @@ body.light-mode #social-icons a {
     }
 
     header img {
-        max-width: 100px;
+        max-width: 80px;
     }
 
     main {
@@ -448,12 +430,25 @@ body.light-mode #social-icons a {
 }
 
 @media (max-width: 480px) {
+    body {
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+    }
+
+    #chat-container {
+        width: 100%;
+        height: 100vh;
+        margin: 0;
+        border-radius: 0;
+    }
+
     header {
         padding: 8px;
     }
 
     header img {
-        max-width: 80px;
+        max-width: 60px;
     }
 
     main {
@@ -484,13 +479,8 @@ body.light-mode #social-icons a {
         gap: 10px;
     }
 
-    #chat-container {
-        max-width: 100%;
-        height: 90vh;
-    }
-
     #messages-container {
-        height: 70vh;
+        height: calc(100vh - 220px); /* Adjust height to fill the space */
     }
 }
 
@@ -544,3 +534,4 @@ body.light-mode #social-icons a {
     justify-content: flex-end;
     gap: 10px;
 }
+
